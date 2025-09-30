@@ -4,7 +4,7 @@ backend:
 
 publish_mode: editorial_workflow
 
-media_folder: "src/assets"
+media_folder: "src/content/blog"
 public_folder: "/assets"
 
 collections:
