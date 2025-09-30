@@ -9,6 +9,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 <html lang="en">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 	</head>
 	<body>
 		<Header />
@@ -46,4 +47,22 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 		</main>
 		<Footer />
 	</body>
+
+	<script>
+	    declare global {
+            interface Window {
+                netlifyIdentity: any;
+            }
+        }
+        if (window.netlifyIdentity) {
+            window.netlifyIdentity.on("init", (user) => {
+                if (!user) {
+                    window.netlifyIdentity.on("login", () => {
+                        document.location.href = "/admin/";
+                    });
+                }
+            });
+            window.netlifyIdentity.init();
+        }
+    </script>
 </html>
