@@ -14,6 +14,7 @@ import FallbackImage from '../assets/images/blog-placeholder-1.jpg';
 import type { MarkdownHeading } from 'astro';
 import TOC from "../pages/blog/TOC.astro";
 import {getAuthorById} from "../lib/author";
+import {slugifyTag} from "../lib/slug";
 
 type BlogData = CollectionEntry<'blog'>['data'];
 type Props = BlogData & {
@@ -186,7 +187,7 @@ const processedHeroImage = heroImage
 					<div class="flex flex-wrap justify-center my-4">
 						{Array.isArray(Astro.props.tags) && Astro.props.tags.map((tag) => (
 							<a
-								href={`/blog/tag/${encodeURIComponent(tag)}/`}
+								href={`/tag/${slugifyTag(tag)}/`}
 								class="no-underline mr-3 text-sm bg-white dark:bg-gray-800 border-1 border-white dark:border-gray-700 hover:border-black dark:hover:border-white text-gray dark:text-gray-200 px-2 py-1 hover:[box-shadow:10px_10px_#ff7a1a] transition ease-in-out"
 							>
 								#{tag}

@@ -26,7 +26,7 @@ const author = getAuthorById(post.data.author || 'default');
       <FormattedDate date={post.data.pubDate} />
       <span>•</span>
       {author && (
-        <a href={`/authors/${author.id}/`} class="hover:text-[color:var(--accent)]">{author.name}</a>
+        <a href={`/@${author.id}/`} class="hover:text-[color:var(--accent)]">{author.name}</a>
       )}
       {readingTimeMin > 0 && (<>
         <span>•</span>
@@ -41,7 +41,7 @@ const author = getAuthorById(post.data.author || 'default');
     </div>
     {post.data.tags && post.data.tags.length > 0 && (
       <div class="flex gap-2 flex-wrap">
-        {post.data.tags.map((t) => <a href={`/blog/tag/${t.replace(/\s+/g,'-').toLowerCase()}/`} class="sw-tag">{t}</a>)}
+        {post.data.tags.map((t) => <a href={`/tag/${t.replace(/\s+/g,'-').toLowerCase()}/`} class="sw-tag">{t}</a>)}
       </div>
     )}
   </div>

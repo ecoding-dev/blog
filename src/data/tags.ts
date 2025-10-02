@@ -4,7 +4,11 @@ export type TagMeta = {
   description: string;
 };
 
-function toTitleCaseFromSlug(slug: string): string {
+function toTitleCaseFromSlug(slug: string | undefined): string {
+  if (!slug || typeof slug !== 'string') {
+    console.error('Invalid slug provided to toTitleCaseFromSlug:', slug);
+    return 'Unknown';
+  }
   return slug
     .replace(/[-_]+/g, ' ')
     .replace(/\b\w/g, (m) => m.toUpperCase())

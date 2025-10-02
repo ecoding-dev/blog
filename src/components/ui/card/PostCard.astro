@@ -3,68 +3,125 @@ import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import FormattedDate from '../../FormattedDate.astro';
 import { calculateReadingTimeFromMarkdown } from '../../../lib/reading';
-import {getAuthorById} from "../../../lib/author";
+import { getAuthorById } from "../../../lib/author";
 
 interface Props { post: CollectionEntry<'blog'> }
 const { post } = Astro.props as Props;
-// Estimate reading time from raw body (Markdown/MDX)
+
+// ⏱️ Tiempo de lectura (markdown crudo)
 let readingTimeMin = 0;
 try {
-  // @ts-ignore - body may not exist until rendered; fallback to data.description
   const md = (post as any).body ?? '';
   readingTimeMin = calculateReadingTimeFromMarkdown(md || post.data.description || '');
 } catch {}
-const author = getAuthorById(post.data.author || 'default');
----
-<article class="
-p-4
-flex
-flex-col
-gap-3
-relative
 
-border-1
-border-gray
-dark:border-gray-700
-hover:border-black
-dark:hover:border-white
-hover:[box-shadow:10px_10px_#ff7a1a]
-transition
-ease-in-out
+const author = getAuthorById(post.data.author || 'default');
+
+// 🗺️ Mapa de TODAS las imágenes locales bajo /src/assets (resueltas en build)
+const localImages = import.meta.glob('/src/assets/**/*.{jpg,jpeg,png,webp,avif,gif}', {
+  eager: true,
+  import: 'default',
+});
+
+// Intentamos resolver el avatar a un import si viene como ruta local en /src/assets
+const size = 22;
+let avatarImport: any | undefined;
+let avatarPath = author?.avatar ?? '';
+
+// Soportamos 3 variantes dinámicas:
+// 1) "/src/assets/authors/fabrizio.jpg" → usar como clave directa del glob
+// 2) "authors/fabrizio.jpg"             → normalizar a "/src/assets/authors/fabrizio.jpg"
+// 3) "/authors/fabrizio.jpg" (en /public) → usar <img> (fallback)
+if (avatarPath.startsWith('/src/assets/')) {
+  avatarImport = localImages[avatarPath];
+} else if (
+    avatarPath &&
+    !avatarPath.startsWith('/public/') &&
+    !avatarPath.startsWith('/authors/') &&
+    !/^https?:\/\//.test(avatarPath)
+) {
+  const candidate = `/src/assets/${avatarPath.replace(/^\/+/, '')}`;
+  avatarImport = localImages[candidate];
+}
+---
+
+<article class="
+  p-4
+  flex
+  flex-col
+  gap-3
+  relative
+  border-1
+  border-gray
+  dark:border-gray-700
+  hover:border-black
+  dark:hover:border-white
+  hover:[box-shadow:10px_10px_#ff7a1a]
+  transition
+  ease-in-out
 ">
   {post.data.heroImage && (
       <div style="max-width: 640px; aspect-ratio: 16/9;" class="outline-hidden">
-        <Image style="width: 100%; height: 100%; object-fit: cover; display: block;" width="640" height="360" src={post.data.heroImage} alt={post.data.title} />
+        {/* heroImage: si es import de /src/assets funciona directo; si es string pública, también sirve */}
+        <Image
+            style="width: 100%; height: 100%; object-fit: cover; display: block;"
+            width="640" height="360"
+            src={post.data.heroImage}
+            alt={post.data.title}
+        />
       </div>
   )}
-  <span class="text-xl md:text-2xl lg:text-3xl font-semibold text-[color:var(--color-text-primary)] line-clamp-2">{post.data.title}</span>
-  <span class="text-sm md:text-base lg:text-lg text-[color:var(--color-text-muted)] line-clamp-2">{post.data.description}</span>
+
+  <span class="text-xl md:text-2xl lg:text-3xl font-semibold text-[color:var(--color-text-primary)] line-clamp-2">
+    {post.data.title}
+  </span>
+  <span class="text-sm md:text-base lg:text-lg text-[color:var(--color-text-muted)] line-clamp-2">
+    {post.data.description}
+  </span>
+
   <div class="flex flex-col text-xs md:text-sm lg:text-base text-[color:var(--color-text-muted)] gap-1">
     <div class="flex items-center gap-2">
       {author && (
-        <a href={`/authors/${author.id}/`} class="flex items-center gap-1 hover:text-[color:var(--accent)] interactive-link no-underline">
-          <img src={author.avatar} alt={author.name} style="width:22px;height:22px;border-radius:50%;object-fit:cover;" />
-          {author.name}
-        </a>
+          <a href={`/@${author.id}/`} class="flex items-center gap-1 hover:text-[color:var(--accent)] interactive-link no-underline">
+            {avatarImport ? (
+                // ✅ Local (src/assets): usa <Image> con dimensiones — no hay MissingImageDimension
+            <Image src={avatarImport} alt={author.name} width={size} height={size}
+                   style="width:22px;height:22px;border-radius:50%;object-fit:cover;" format="webp" />
+            ) : (
+                // ✅ Fallback (p. ej. /public/authors/...) -> <img> con width/height para evitar CLS
+            <img src={avatarPath || '/fallback-avatar.png'} alt={author.name}
+                 width={size} height={size}
+                 style="width:22px;height:22px;border-radius:50%;object-fit:cover;"
+                 loading="lazy" decoding="async" />
+            )}
+            {author.name}
+          </a>
       )}
     </div>
+
     <div class="flex items-center gap-1">
       <FormattedDate date={post.data.pubDate} />
     </div>
+
     {readingTimeMin > 0 && (
-      <div class="flex items-center gap-1">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="9"/>
-          <path d="M12 7v5l3 3"/>
-        </svg>
-        {readingTimeMin} min read
-      </div>
+        <div class="flex items-center gap-1">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 7v5l3 3"/>
+          </svg>
+          {readingTimeMin} min read
+        </div>
     )}
   </div>
+
   {post.data.tags && post.data.tags.length > 0 && (
-    <div class="flex gap-2 flex-wrap">
-      {post.data.tags.map((t) => <a href={`/blog/tag/${t.replace(/\s+/g,'-').toLowerCase()}/`} class="sw-tag interactive-link">{t}</a>)}
-    </div>
+      <div class="flex gap-2 flex-wrap">
+        {post.data.tags.map((t) => (
+            <a href={`/tag/${t.replace(/\s+/g,'-').toLowerCase()}/`} class="sw-tag interactive-link">{t}</a>
+        ))}
+      </div>
   )}
+
   <a href={`/blog/${post.id}/`} class="stretched-link" aria-label={post.data.title}></a>
 </article>

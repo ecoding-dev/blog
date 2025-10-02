@@ -3,13 +3,14 @@ import authors from '../../data/authors.json';
 import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
-  // Genera un path por cada autor en el JSON
-  return authors.map(author => ({ params: { slug: author.id } }));
+  // Genera un path por cada autor en el JSON con el prefijo @
+  return authors.map(author => ({ params: { slug: `@${author.id}` } }));
 }
 
 const { slug } = Astro.params;
-const author = authors.find(a => a.id === slug);
-const posts = (await getCollection('blog')).filter(post => post.data.author === slug);
+const authorId = slug.replace('@', ''); // Elimina el prefijo @ para buscar el autor
+const author = authors.find(a => a.id === authorId);
+const posts = (await getCollection('blog')).filter(post => post.data.author === authorId);
 ---
 
 {author ? (

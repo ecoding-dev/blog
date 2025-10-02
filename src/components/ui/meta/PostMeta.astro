@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import FormattedDate from '../../FormattedDate.astro';
 import { slugifyTag as slugify } from '../../../lib/slug';
 import authors from '../../../data/authors.json';
@@ -7,19 +8,67 @@ import SkillBadges from './SkillBadges.astro';
 
 interface Props {
   pubDate: Date;
-  readingTimeMin: number;
-  author: any;
+  author: {
+    id: string;
+    name: string;
+    avatar?: string; // puede venir como "/src/assets/..." o "/authors/..." (public)
+    role?: string;
+    bio?: string;
+    skills?: string[];
+    social?: Record<string, string>;
+  };
+  size?: number; // opcional: tamaño del avatar (default 48)
 }
-const { pubDate, readingTimeMin, author } = Astro.props as Props;
+const { pubDate, author, size = 48 } = Astro.props as Props;
+
+// Mapa de todas las imágenes locales dentro de /src/assets
+const localImages = import.meta.glob('/src/assets/**/*.{jpg,jpeg,png,webp,avif,gif}', {
+  eager: true,
+  import: 'default',
+});
+
+// Resuelve el avatar dinámicamente:
+// - Si viene como "/src/assets/..." → úsalo como clave del glob
+// - Si viene como "authors/fabrizio.jpg" → lo normalizamos a "/src/assets/authors/fabrizio.jpg"
+// - Si viene como "/authors/..." (en /public) → lo servimos con <img> (fallback)
+let importedSrc: any | undefined = undefined;
+let avatarPath = author.avatar ?? '';
+
+if (avatarPath.startsWith('/src/assets/')) {
+  importedSrc = localImages[avatarPath];
+} else if (
+    avatarPath &&
+    !avatarPath.startsWith('/public/') &&
+    !avatarPath.startsWith('/authors/') && // carpeta típica dentro de /public
+    !/^https?:\/\//.test(avatarPath)
+) {
+  // Caso relativo tipo "authors/fabrizio.jpg" → conviértelo a /src/assets/...
+  const candidate = `/src/assets/${avatarPath.replace(/^\/+/, '')}`;
+  importedSrc = localImages[candidate];
+}
 ---
 
 <div class="sw-post-meta flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-50 dark:bg-gray-800 px-4 py-5 rounded-sm">
   <div class="flex items-top gap-3">
     <div class="w-12 h-12 flex-shrink-0 rounded-full overflow-hidden border border-[color:var(--color-border-light)] dark:border-[color:var(--color-border-dark)]">
-      <img src={author.avatar} alt={author.name} width="48" height="48" class="w-full h-full object-cover" />
+      {importedSrc ? (
+          /* ✅ Local en /src/assets → usa astro:assets con dimensiones (evita MissingImageDimension) */
+          <Image src={importedSrc} alt={author.name} width={size} height={size} format="webp" />
+      ) : (
+          /* ✅ Fallback (ej. /public/authors/...) → usa <img> con width/height para evitar CLS */
+          <img
+              src={avatarPath || '/fallback-avatar.png'}
+              alt={author.name}
+              class="w-full h-full object-cover"
+              width={size}
+              height={size}
+              loading="lazy"
+              decoding="async"
+          />
+      )}
     </div>
     <div class="flex flex-col min-w-0">
-      <a href={`/blog/author/${author.id }/`} class="no-underline text-sm font-semibold text-[color:var(--color-text-primary)] dark:text-[color:var(--color-text-primary-dark)] hover:text-[color:var(--accent)] truncate">{author.name}</a>
+      <a href={`/@${author.id }/`} class="no-underline text-sm font-semibold text-[color:var(--color-text-primary)] dark:text-[color:var(--color-text-primary-dark)] hover:text-[color:var(--accent)] truncate">{author.name}</a>
       {author.role && <span class="text-xs text-gray dark:text-gray-400 truncate">{author.role}</span>}
       {author.bio && <span class="text-xs text-[color:var(--color-text-secondary)] dark:text-[color:var(--color-text-secondary-dark)] mt-1 line-clamp-2">{author.bio}</span>}
       {author.social && <SocialBadges social={author.social} />}

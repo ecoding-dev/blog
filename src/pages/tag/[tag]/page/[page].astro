@@ -1,0 +1,80 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../../../components/BaseHead.astro';
+import Header from '../../../../components/sections/Header.astro';
+import Footer from '../../../../components/sections/Footer.astro';
+import PostCard from '../../../../components/ui/card/PostCard.astro';
+import BlogPagination from '../../../../components/ui/nav/BlogPagination.astro';
+
+import { slugifyTag } from '../../../../lib/slug';
+import { getTagMeta } from '../../../../data/tags';
+
+export async function getStaticPaths() {
+  const PAGE_SIZE = 6;
+  const posts = await getCollection('blog');
+
+  const tags = [...new Set(
+      posts.flatMap((p) => p.data.tags || [])
+          .filter((t) => typeof t === 'string' && t.trim() !== '')
+  )].map(slugifyTag);
+
+  const paths = [];
+  for (const sTag of tags) {
+    const tagPosts = posts.filter((p) =>
+        (p.data.tags || []).some((t) => slugifyTag(t) === sTag)
+    );
+    if (tagPosts.length === 0) continue;
+
+    const totalPages = Math.max(1, Math.ceil(tagPosts.length / PAGE_SIZE));
+    for (let i = 1; i <= totalPages; i++) { // 👈 igual que autores: incluye page=1
+      paths.push({ params: { tag: sTag, page: String(i) } });
+    }
+  }
+  return paths;
+}
+
+const PAGE_SIZE = 6;
+const { tag, page } = Astro.params;
+
+const all = await getCollection('blog');
+const posts = all
+    .filter((p) => (p.data.tags || []).some((t) => slugifyTag(t) === tag))
+    .sort((a, b) => +b.data.pubDate - +a.data.pubDate);
+
+const totalPages = Math.max(1, Math.ceil(posts.length / PAGE_SIZE));
+const currentPage = Math.max(1, Math.min(totalPages, parseInt(page, 10)));
+const start = (currentPage - 1) * PAGE_SIZE;
+const pagePosts = posts.slice(start, start + PAGE_SIZE);
+
+const meta = getTagMeta(tag);
+const title = `Etiqueta: ${meta.title} - Página ${currentPage}`;
+const description = `Entradas etiquetadas con ${meta.title}`;
+---
+
+<html lang="es" data-theme="dark" class="dark">
+<head>
+  <BaseHead title={title} description={description} />
+  {currentPage < totalPages && (
+      <link rel="next" href={`/tag/${tag}/page/${currentPage + 1}/`} />
+  )}
+  {currentPage > 1 && (
+      <link rel="prev" href={currentPage === 2 ? `/tag/${tag}/` : `/tag/${tag}/page/${currentPage - 1}/`} />
+  )}
+</head>
+<body>
+<Header />
+<main class="mx-auto max-w-6xl px-4 py-10 space-y-6">
+  <h1 class="text-3xl font-bold">Etiqueta: {meta.title}</h1>
+  <div class="blog-grid">
+    {pagePosts.map((p) => <PostCard post={p} />)}
+  </div>
+  <BlogPagination
+      currentPage={currentPage}
+      totalPages={totalPages}
+      basePath={`/tag/${tag}/page`}
+      firstPagePath={`/tag/${tag}`}
+  />
+</main>
+<Footer />
+</body>
+</html>

@@ -21,6 +21,7 @@ if (featured) {
   const html = await Astro.slots.render('default');
   featuredReading = calculateReadingTimeFromHtml(html ?? '');
 }
+const basePath = '/blog/page';
 ---
 
 <!doctype html>
@@ -28,7 +29,7 @@ if (featured) {
 	<head>
     <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
     {totalPages > 1 && (
-      <link rel="next" href={`/blog/page/2/`} />
+      <link rel="next" href={`${basePath}/2/`} />
     )}
 	</head>
 	<body>
@@ -42,7 +43,12 @@ if (featured) {
             )}
 
             <BlogAllArticles posts={firstPagePosts} />
-            <BlogPagination currentPage={1} totalPages={totalPages} />
+            <BlogPagination
+                    currentPage={1}
+                    totalPages={totalPages}
+                    basePath={`/blog/page`}
+                    firstPagePath={`/blog/`}
+            />
         </main>
         <Footer />
 	</body>
