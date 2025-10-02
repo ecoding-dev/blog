@@ -1,0 +1,39 @@
+---
+import type { TocItem } from "../../utils/generateToc";
+import TOCHeading from "./TOCHeading.astro";
+const { heading } = Astro.props as { heading: TocItem };
+---
+{heading && heading.slug && (
+  <li>
+    <a
+      href={`#${heading.slug}`}
+      class="
+        text-sm
+        mt-1
+        line-clamp-2
+        [padding-left:1ch]
+        [text-indent:-1ch]
+        before:content-['#']
+        hover:text-accent-two
+        no-underline
+        hover:text-primary
+        before:text-primary
+      "
+      aria-label={`Scroll to section: ${heading.text}`}
+    >
+      {heading.text}
+    </a>
+    {heading.children && heading.children.length > 0 && (
+      <ul class="toc-sublist">
+        {heading.children.map((child: TocItem) => (
+          <TOCHeading heading={child} />
+        ))}
+      </ul>
+    )}
+  </li>
+)}
+<style>
+.toc-sublist {
+  margin-left: .75rem;
+}
+</style>

@@ -1,0 +1,24 @@
+---
+import Layout from '../layouts/BlogPost.astro';
+import GlowLineSeparator from '@/components/ui/separator/GlowLineSeparator.astro';
+const pageTitle = 'Sobre mí';
+const pageDescription = 'Conoce más sobre mi trayectoria y enfoque en ingeniería de software.';
+---
+
+<Layout title={pageTitle} description={pageDescription} pubDate={new Date()} showHeader={false}>
+  <p>
+    ¡Hola! Soy un ingeniero de software senior apasionado por diseñar sistemas confiables y lanzar productos que sean un placer de usar.
+  </p>
+  <p>
+    Trabajo en todo el stack con TypeScript, Node.js, React/Next.js y PostgreSQL. Me importa mucho el código legible, los tests sólidos y la observabilidad. Mi enfoque: entregar en pequeño, iterar rápido, medir resultados.
+  </p>
+  <p>
+    Recientemente he liderado una migración de un monolito a servicios bien definidos, mejorado la latencia p95 e implementado CI/CD con entornos de preview y quality gates.
+  </p>
+  <p>
+    Fuera del trabajo en features, disfruto mentorizar, documentar y construir componentes de design system que aceleran a los equipos. Siempre aprendiendo—y siempre dispuesto a colaborar en problemas significativos.
+  </p>
+
+  <GlowLineSeparator />
+
+</Layout>

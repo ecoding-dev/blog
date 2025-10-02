@@ -1,0 +1,63 @@
+[
+  {
+    "id": "fabrizio",
+    "name": "Fabrizio Piminchumo",
+    "avatar": "/src/assets/authors/fabrizio.jpg",
+    "bio": "Con experiencia en desarrollo backend y análisis de datos. Es autodidacta y ha adquirido habilidades en diferentes lenguajes de programación y herramientas de análisis de datos.",
+    "role": "Ingeniero de Sistemas e Informática",
+    "skills": [
+      "C#",
+      "SASS",
+      "SQL",
+      "HTML5",
+      "CSS3",
+      "JavaScript",
+      "Java",
+      "PHP",
+      "Astro",
+      "React",
+      "TypeScript",
+      "Arduino",
+      "PHPUnit",
+      "NodeJS",
+      "Webpack",
+      "Spring",
+      "NPM",
+      "Vue.js",
+      "Bootstrap",
+      "jQuery",
+      "Laravel",
+      "GitHub Pages",
+      "MariaDB",
+      "Microsoft SQL Server",
+      "Netlify",
+      "Firebase",
+      "Apache",
+      "MySQL",
+      "PostgreSQL",
+      "MongoDB",
+      "SQLite",
+      "Heroku"
+    ],
+    "social": {
+      "github": "https://github.com/F4brizio",
+      "linkedin": "https://www.linkedin.com/in/devfabrizio",
+      "twitter": "https://twitter.com/F4brizioDev",
+      "website": "https://f4brizio.github.io/",
+      "stackoverflow": "https://stackoverflow.com/users/9032099"
+    }
+  },
+  {
+    "id": "ana-garcia",
+    "name": "Ana García",
+    "avatar": "/src/assets/images/sample-avatar.jpg",
+    "bio": "Redactora técnica y entusiasta de la documentación clara.",
+    "role": "Technical Writer",
+    "skills": ["Markdown", "Astro", "SEO"],
+    "social": {
+      "twitter": "https://twitter.com/anagarcia",
+      "github": "https://github.com/anagarcia"
+    }
+  }
+]
+

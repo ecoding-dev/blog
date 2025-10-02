@@ -1,0 +1,27 @@
+---
+import authors from '../../data/authors.json';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  // Genera un path por cada autor en el JSON
+  return authors.map(author => ({ params: { slug: author.id } }));
+}
+
+const { slug } = Astro.params;
+const author = authors.find(a => a.id === slug);
+const posts = (await getCollection('blog')).filter(post => post.data.author === slug);
+---
+
+{author ? (
+  <>
+    <!--<AuthorCard author={author} />-->
+    <h2>Artículos de {author.name}</h2>
+    <ul>
+      {posts.length > 0 ? posts.map(post => (
+        <li><a href={`/blog/${post.id}/`}>{post.data.title}</a></li>
+      )) : <li>No hay artículos para este autor.</li>}
+    </ul>
+  </>
+) : (
+  <p>Autor no encontrado.</p>
+)}

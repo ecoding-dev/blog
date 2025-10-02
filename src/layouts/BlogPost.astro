@@ -1,0 +1,300 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/sections/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Header from '../components/sections/Header.astro';
+import PostMeta from '../components/ui/meta/PostMeta.astro';
+import ShareButtons from '../components/ui/share/ShareButtons.astro';
+import PostNav from '../components/ui/nav/PostNav.astro';
+import { slugifyCategory } from '../data/categories';
+
+import type { MarkdownHeading } from 'astro';
+import TOC from "../pages/blog/TOC.astro";
+import {getAuthorById} from "../lib/author";
+
+type BlogData = CollectionEntry<'blog'>['data'];
+type Props = BlogData & {
+	showHeader?: boolean;
+	prevPost?: { id: string; title: string } | null;
+	nextPost?: { id: string; title: string } | null;
+	readingTimeMin?: number;
+	headings?: MarkdownHeading[];
+};
+
+const {
+	title, description, pubDate, updatedDate, heroImage,
+	showHeader = true, prevPost = null, nextPost = null,
+	readingTimeMin = 0, headings = []
+} = Astro.props as Props;
+
+const author = getAuthorById(Astro.props.author || 'fabrizio');
+
+---
+
+<html lang="en" data-theme="dark" class="dark">
+<head>
+	<BaseHead
+		title={title}
+		description={description}
+		image={heroImage}
+		section={Astro.props.category}
+		datePublished={pubDate ? new Date(pubDate).toISOString() : undefined}
+		dateModified={updatedDate ? new Date(updatedDate).toISOString() : undefined}
+		keywords={Array.isArray(Astro.props.tags) ? Astro.props.tags.join(', ') : undefined}
+	/>
+	<meta property="og:type" content="article" />
+	{pubDate && <meta property="article:published_time" content={new Date(pubDate).toISOString()} />}
+	{updatedDate && <meta property="article:modified_time" content={new Date(updatedDate).toISOString()} />}
+	<meta property="article:author" content={Astro.props.author || 'Site Author'} />
+	{Array.isArray(Astro.props.tags) && Astro.props.tags.map((t) => (
+		<meta property="article:tag" content={t} />
+	))}
+
+	<script type="application/ld+json" set:html={JSON.stringify({
+		'@context':'https://schema.org','@type':'Article',
+		headline:title, description,
+		image: Astro.props.heroImage ? new URL(Astro.props.heroImage.src, Astro.site).toString() : undefined,
+		datePublished: pubDate ? new Date(pubDate).toISOString() : undefined,
+		dateModified: updatedDate ? new Date(updatedDate).toISOString() : undefined,
+		author: [{ '@type':'Person', name: Astro.props.author || 'Site Author' }],
+		publisher: { '@type':'Organization', name:'guihubie.com' },
+		mainEntityOfPage: new URL(Astro.url.pathname, Astro.site).toString(),
+		url: new URL(Astro.url.pathname, Astro.site).toString(),
+	})} />
+
+	<script type="application/ld+json" set:html={JSON.stringify({
+		'@context':'https://schema.org','@type':'BreadcrumbList',
+		itemListElement: [
+			{ '@type':'ListItem', position:1, name:'Home', item:new URL('/', Astro.site).toString() },
+			{ '@type':'ListItem', position:2, name:'Blog', item:new URL('/blog/', Astro.site).toString() },
+			{ '@type':'ListItem', position:3, name:title, item:new URL(Astro.url.pathname, Astro.site).toString() }
+		],
+	})} />
+
+	<style>
+		/* Layout principal */
+		main {
+			width: 1280px;
+			max-width: calc(100% - 2em);
+			margin: auto;
+			background: var(--color-bg-primary);
+			/* grid 2 columnas en desktop: contenido + TOC */
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 2rem;
+		}
+		@media (min-width: 960px) {
+			main {
+				grid-template-columns: minmax(0, 1fr) 16rem; /* columna de 16rem para TOC */
+				align-items: start;
+			}
+		}
+
+		.hero-image { width: 100%; }
+		.hero-image img {
+			display: block; margin: 0 auto; border-radius: 12px; box-shadow: var(--box-shadow);
+		}
+
+		.prose {
+			width: 100%;
+			max-width: 870px;
+			margin: auto;
+			padding: 0.05em;
+			color: var(--color-text-secondary);
+		}
+		.title { margin-bottom: 1em; padding: 1em 0; text-align: center; line-height: 1; }
+		.title h1 { margin: 0 0 .5em 0; color: var(--color-text-primary); }
+		.date { margin-bottom: .5em; color: var(--color-text-muted); }
+		.last-updated-on { font-style: italic; }
+
+		/* TOC panel (columna derecha) */
+		aside#toc-panel {
+			position: sticky;
+			top: 5rem; /* similar a top-20 (~80px); ajusta si tu header es más alto */
+			height: max-content;
+		}
+
+		/* Botón TOC (desktop) */
+		.toc-toggle {
+			display: none;
+		}
+		@media (min-width: 960px) {
+			.toc-toggle {
+				display: inline-flex;
+				align-items: center; justify-content: center;
+				width: 2rem; height: 2rem;
+				margin-right: .5rem;
+				border-radius: .5rem;
+				background: color-mix(in oklab, var(--accent) 10%, transparent);
+				color: var(--accent);
+			}
+			.toc-toggle:hover { filter: brightness(1.1); }
+		}
+
+		/* Compensar header fijo al navegar por anclas */
+		:is(.prose) :is(h2, h3, h4, h5, h6)[id] {
+			scroll-margin-top: 6.5rem; /* ajusta a la altura real de tu header */
+		}
+	</style>
+</head>
+
+<body>
+<Header />
+<div class="container mx-auto px-4 max-w-[1080px]">
+	<div class="relative flex-grow mt-8 sm:mt-12 md:mt-[3.5rem] lg:mt-20 xl:mt-24">
+		<!-- FLEX sin wrap, con gap -->
+		{showHeader && (
+			<div class="hero-image">
+				{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
+			</div>
+		)}
+		{showHeader && (
+			<div class="mt-8">
+				<div>
+					<p class="text-center w-full mb-5 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[color:var(--color-text-primary)]">{title}</p>
+					<div class="flex items-center justify-center gap-3 text-base text-[color:var(--color-text-muted)]">
+						<div class="flex items-center gap-1">
+							<svg width="14" height="14" aria-hidden="true" focusable="false" data-icon="hugeicons:calendar-03">
+								<symbol id="ai:hugeicons:calendar-03" viewBox="0 0 24 24">
+									<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18 2v2M6 2v2m5.996 9h.008m-.008 4h.008m3.987-4H16m-8 0h.009M8 17h.009M3.5 8h17m-18 4.243c0-4.357 0-6.536 1.252-7.89C5.004 3 7.02 3 11.05 3h1.9c4.03 0 6.046 0 7.298 1.354C21.5 5.707 21.5 7.886 21.5 12.244v.513c0 4.357 0 6.536-1.252 7.89C18.996 22 16.98 22 12.95 22h-1.9c-4.03 0-6.046 0-7.298-1.354C2.5 19.293 2.5 17.114 2.5 12.756zM3 8h18" color="currentColor"></path>
+								</symbol>
+								<use href="#ai:hugeicons:calendar-03"></use>
+							</svg>
+							<span>{
+								pubDate.toLocaleDateString('en-us', {
+									year: 'numeric',
+									month: 'short',
+									day: 'numeric',
+								})
+							}</span>
+						</div>
+						<span class="inline-block w-1 h-1 bg-[color:var(--color-text-muted)] rounded-full"></span>
+						<div class="flex items-center gap-1">
+							<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+								<path fill="currentColor" d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20Zm0-18a8 8 0 1 0 0 16 8 8 0 0 0 0-16Zm1 9h3v-2h-2V7h-2v6Z"/>
+							</svg>
+							<span>{readingTimeMin} min read</span>
+						</div>
+					</div>
+
+					<div class="flex flex-wrap justify-center my-4">
+						{Array.isArray(Astro.props.tags) && Astro.props.tags.map((tag) => (
+							<a
+								href={`/blog/tag/${encodeURIComponent(tag)}/`}
+								class="no-underline mr-3 text-sm bg-white dark:bg-gray-800 border-1 border-white dark:border-gray-700 hover:border-black dark:hover:border-white text-gray dark:text-gray-200 px-2 py-1 hover:[box-shadow:10px_10px_#ff7a1a] transition ease-in-out"
+							>
+								#{tag}
+							</a>
+						))}
+					</div>
+					<div class="flex flex-wrap justify-center  my-4 mb-8">
+						{Astro.props.category && (
+							<a class="no-underline mr-3 text-sm bg-white dark:bg-gray-800 border-1 border-gray dark:border-gray-700 hover:border-black dark:hover:border-white text-gray dark:text-gray-200 px-2 py-1 hover:[box-shadow:10px_10px_#ff7a1a] transition ease-in-out" href={`/blog/category/${slugifyCategory(Astro.props.category)}/`}>{Astro.props.category}</a>
+
+						)}
+					</div>
+					<hr />
+				</div>
+			</div>
+		)}
+		<div class="mt-6 md:flex md:flex-nowrap md:items-start gap-x-8">
+			<!-- ARTICLE: crece y puede encoger su contenido -->
+			<article class="flex-1 min-w-0">
+
+				<slot />
+				<PostMeta pubDate={pubDate} readingTimeMin={readingTimeMin} author={author} />
+				<ShareButtons title={title} url={Astro.url.toString()} />
+				<PostNav prev={prevPost} next={nextPost} />
+			</article>
+
+			<!-- ASIDE: ancho fijo + sticky (solo en md+) -->
+			{headings.length > 0 && (
+				<aside
+					id="toc-panel"
+					aria-label="Table of contents"
+					class="hidden md:block
+                 md:sticky md:top-20 md:self-start
+                 md:flex-none md:shrink-0 md:basis-[22rem] md:w-[16rem]"
+				>
+					<div class="rounded-lg bg-gray-50 dark:bg-gray-900">
+						<div class="sticky top-0 z-10 flex items-center justify-between px-4 py-3 bg-bgColor dark:bg-gray-800 rounded-t-lg">
+							<span class="mb-0 pb-0 text-gray-900 dark:text-gray-100">Table of Contents</span>
+							<button id="close-toc" class="
+			w-8
+			rounded-lg
+			bg-accent-base/5 dark:bg-accent-base/10
+			text-accent-base dark:text-accent-base
+			hover:bg-accent-base/10 dark:hover:bg-accent-base/20
+			" aria-label="Close TOC">✕</button>
+						</div>
+						<nav class="max-h-[calc(100vh-6.5rem)] overflow-y-auto px-4 py-4 pt-2">
+							<TOC headings={headings} panelId="toc-panel" closeBtnId="close-toc" />
+						</nav>
+					</div>
+				</aside>
+			)}
+			<!-- Botón TOC (solo desktop) -->
+			{headings.length > 0 && (
+				<button
+					style="display: none"
+					id="toggle-toc"
+					class="toc-toggle
+					md:sticky
+					md:top-20
+					md:flex-none
+					md:shrink-0"
+					aria-label="Table of Contents"
+					aria-controls="toc-panel"
+					aria-expanded="true"
+				>
+					☰
+				</button>
+			)}
+		</div>
+	</div>
+</div>
+
+<Footer />
+
+<!-- Script: toggle y resalte activo con IntersectionObserver -->
+<script>
+	(() => {
+		const tocPanel = document.getElementById('toc-panel');
+		const toggleBtn = document.getElementById('toggle-toc');
+		const closeBtn  = document.getElementById('close-toc');
+
+		if (toggleBtn && tocPanel) {
+			const setVisible = (show) => {
+				tocPanel.style.display = show ? '' : 'none';
+				toggleBtn.setAttribute('aria-expanded', String(show));
+				toggleBtn.style.display = show ? 'none' : '';
+			};
+			toggleBtn.addEventListener('click', () => {
+				const visible = getComputedStyle(tocPanel).display !== 'none';
+				setVisible(!visible);
+			});
+			if (closeBtn) closeBtn.addEventListener('click', () => setVisible(false));
+		}
+
+		// Resaltar link activo al hacer scroll
+		const links = Array.from(tocPanel?.querySelectorAll('a[href^="#"]') ?? []);
+		if (links.length) {
+			const map = new Map(
+				links.map(a => [decodeURIComponent(a.getAttribute('href').slice(1)), a])
+			);
+			const headings = Array.from(document.querySelectorAll('.prose h2[id], .prose h3[id], .prose h4[id]'));
+			const setActive = (id) => {
+				links.forEach(a => a.classList.remove('is-active'));
+				const a = map.get(id); if (a) a.classList.add('is-active');
+			};
+			const obs = new IntersectionObserver((entries) => {
+				entries.forEach(e => { if (e.isIntersecting) setActive(e.target.id); });
+			}, { rootMargin: '0px 0px -60% 0px', threshold: 0 });
+			headings.forEach(h => obs.observe(h));
+		}
+	})();
+</script>
+</body>
+</html>

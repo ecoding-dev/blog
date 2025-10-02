@@ -1,0 +1,62 @@
+---
+interface Props {
+  social: Record<string, string>;
+}
+const { social } = Astro.props as Props;
+
+function getTwitterUsername(url: string) {
+  // https://twitter.com/username
+  const match = url.match(/twitter.com\/(#!\/)?([A-Za-z0-9_]+)/);
+  return match ? match[2] : null;
+}
+function getGitHubUsername(url: string) {
+  // https://github.com/username
+  const match = url.match(/github.com\/([A-Za-z0-9_-]+)/);
+  return match ? match[1] : null;
+}
+function getLinkedInUsername(url: string) {
+  // https://linkedin.com/in/username
+  const match = url.match(/linkedin.com\/in\/([A-Za-z0-9_-]+)/);
+  return match ? match[1] : null;
+}
+function getStackOverflowId(url: string) {
+  // https://stackoverflow.com/users/1234567
+  const match = url.match(/stackoverflow.com\/users\/(\d+)/);
+  return match ? match[1] : null;
+}
+
+---
+<div class="flex flex-wrap gap-2 mt-3">
+  {social.twitter && getTwitterUsername(social.twitter) && (
+    <a href={`https://twitter.com/intent/follow?screen_name=${getTwitterUsername(social.twitter)}`}
+      target="_blank" rel="noopener noreferrer">
+      <img src={`https://img.shields.io/twitter/follow/${getTwitterUsername(social.twitter)}?label=Follow`} alt="Twitter Follow Badge" />
+    </a>
+  )}
+  {social.github && getGitHubUsername(social.github) && (
+    <a href={social.github} target="_blank" rel="noopener noreferrer">
+      <img src={`https://img.shields.io/github/followers/${getGitHubUsername(social.github)}?label=Follow&style=social`} alt="GitHub Followers Badge" />
+    </a>
+  )}
+  {social.linkedin && getLinkedInUsername(social.linkedin) && (
+    <a href={social.linkedin} target="_blank" rel="noopener noreferrer">
+      <img src={`https://img.shields.io/badge/-${getLinkedInUsername(social.linkedin)}-blue?style=flat-square&logo=Linkedin&logoColor=white`} alt="LinkedIn Badge" />
+    </a>
+  )}
+  {social.website && (
+    <a href={social.website} target="_blank" rel="noopener noreferrer">
+      <img src="https://img.shields.io/badge/Website-46a2f1.svg?&style=flat-square&logo=Google-Chrome&logoColor=white" alt="Website Badge" />
+    </a>
+  )}
+  {social.stackoverflow && getStackOverflowId(social.stackoverflow) && (
+    <a href={social.stackoverflow} target="_blank" rel="noopener noreferrer">
+      <img src={`https://img.shields.io/stackexchange/stackoverflow/r/${getStackOverflowId(social.stackoverflow)}?color=orange&label=reputation&logo=stackoverflow`} alt="StackOverflow Badge" />
+    </a>
+  )}
+  {social.komarev && (
+    <a href="#" target="_blank" rel="noopener noreferrer">
+      <img src={`https://komarev.com/ghpvc/?username=${social.komarev}&style=plastic&label=visits`} alt="Profile Views Badge" />
+    </a>
+  )}
+</div>
+

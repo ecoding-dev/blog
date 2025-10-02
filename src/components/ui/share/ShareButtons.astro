@@ -1,0 +1,100 @@
+---
+interface Props {
+    title: string;
+    url: string;
+}
+const {title, url} = Astro.props as Props;
+const hnUrl = `https://news.ycombinator.com/submitlink?u=${encodeURIComponent(url)}&t=${encodeURIComponent(title)}`;
+const liUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+const rdUrl = `https://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`;
+const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`;
+
+import xIcon from '../../../assets/icons/x-blog-post-share-icon.svg?raw';
+import hnIcon from '../../../assets/icons/icons8-y-combinator.svg?raw';
+import liIcon from '../../../assets/icons/linkedin-blog-post-shareicon.svg?raw';
+import rdIcon from '../../../assets/icons/reddit-blog-post-share-icon.svg?raw';
+---
+
+<div class="flex flex-col mt-8 gap-2">
+    <span class="text-lg sm:text-xl md:text-2xl text-black dark:text-gray-100 pb-0 mb-0">
+        Comparte este artículo:
+    </span>
+    <div class="flex flex-wrap gap-4 mb-5">
+        <button class="flex items-center justify-center no-underline w-18 h-10 mr-3 text-sm bg-white dark:bg-gray-800 border border-black dark:border-gray-700 dark:hover:border-white text-gray-800 dark:text-gray-200 px-2 py-1 [box-shadow:10px_10px_#000000] transition ease-in-out"
+                aria-label="Compartir en X"
+                onclick={`window.open('${xUrl}', '_blank')`}
+        >
+            <svg class="mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="14" height="14">
+                <path d="M 6.9199219 6 L 21.136719 26.726562 L 6.2285156 44 L 9.40625 44 L 22.544922 28.777344 L 32.986328 44 L 43 44 L 28.123047 22.3125 L 42.203125 6 L 39.027344 6 L 26.716797 20.261719 L 16.933594 6 L 6.9199219 6 z"
+                      fill="currentColor"/>
+            </svg>
+        </button>
+        <button class="flex items-center justify-center no-underline w-18 h-10 mr-3 text-sm bg-white dark:bg-gray-800 border border-black dark:border-gray-700 dark:hover:border-white text-gray-800 dark:text-gray-200 px-2 py-1 [box-shadow:10px_10px_#FF6600] transition ease-in-out"
+                aria-label="Compartir en Hacker News"
+                onclick={`window.open('${hnUrl}', '_blank')`}
+        >
+            <svg class="mx-auto dark:text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14">
+                <path d="M 20 2 L 4 2 C 2.894531 2 2 2.894531 2 4 L 2 20 C 2 21.105469 2.894531 22 4 22 L 20 22 C 21.105469 22 22 21.105469 22 20 L 22 4 C 22 2.894531 21.105469 2 20 2 Z M 13 13 L 13 18 L 11 18 L 11 13 L 7 6 L 9 6 L 12 11 L 15 6 L 16.949219 6 Z"
+                      fill="currentColor"/>
+            </svg>
+        </button>
+        <button class="flex items-center justify-center no-underline w-18 h-10 mr-3 text-sm bg-white dark:bg-gray-800 border border-black dark:border-gray-700 dark:hover:border-white text-gray-800 dark:text-gray-200 px-2 py-1 [box-shadow:10px_10px_#0077B5] transition ease-in-out"
+                aria-label="Compartir en LinkedIn"
+                onclick={`window.open('${liUrl}', '_blank')`}
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-linkedin"
+                 viewBox="0 0 16 16">
+                <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z"/>
+            </svg>
+        </button>
+        <button class="flex items-center justify-center no-underline w-18 h-10 mr-3 text-sm bg-white dark:bg-gray-800 border border-black dark:border-gray-700 dark:hover:border-white text-gray-800 dark:text-gray-200 px-2 py-1 [box-shadow:10px_10px_#FF4500] transition ease-in-out"
+                aria-label="Compartir en Reddit"
+                onclick={`window.open('${rdUrl}', '_blank')`}
+        >
+            <svg class="mx-auto dark:text-white" width="14" height="14" viewBox="0 -1.5 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                 xmlns:xlink="http://www.w3.org/1999/xlink">
+                <title>reddit [#143]</title>
+                <desc>Created with Sketch.</desc>
+                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <g id="Dribbble-Light-Preview" transform="translate(-100.000000, -7561.000000)" fill="currentColor">
+                        <g id="icons" transform="translate(56.000000, 160.000000)">
+                            <path d="M57.029,7412.24746 C56.267,7412.24746 55.628,7411.6217 55.628,7410.8499 C55.628,7410.07708 56.267,7409.43103 57.029,7409.43103 C57.79,7409.43103 58.407,7410.07708 58.407,7410.8499 C58.407,7411.6217 57.791,7412.24746 57.029,7412.24746 M57.223,7414.82961 C56.55,7415.51116 55.495,7415.8428 53.999,7415.8428 C52.502,7415.8428 51.448,7415.51116 50.776,7414.82961 C50.63,7414.68154 50.63,7414.44219 50.776,7414.2931 C50.921,7414.14503 51.158,7414.14503 51.304,7414.2931 C51.829,7414.82556 52.71,7415.08519 53.999,7415.08519 C55.287,7415.08519 56.169,7414.82556 56.695,7414.2931 C56.84,7414.14503 57.077,7414.14503 57.223,7414.2931 C57.369,7414.44219 57.369,7414.68154 57.223,7414.82961 M49.592,7410.8499 C49.592,7410.07809 50.23,7409.43103 50.991,7409.43103 C51.752,7409.43103 52.369,7410.07809 52.369,7410.8499 C52.369,7411.6217 51.752,7412.24746 50.991,7412.24746 C50.23,7412.24746 49.592,7411.6217 49.592,7410.8499 M64,7409.31339 C64,7408.04665 62.984,7407.01623 61.735,7407.01623 C61.159,7407.01623 60.616,7407.23428 60.2,7407.62475 C58.705,7406.63793 56.703,7406 54.486,7405.91278 L55.709,7402.12677 L58.921,7402.89351 C58.922,7403.93611 59.758,7404.78296 60.786,7404.78296 C61.814,7404.78296 62.651,7403.93408 62.651,7402.89148 C62.651,7401.84888 61.814,7401 60.786,7401 C60.016,7401 59.355,7401.47465 59.07,7402.15112 C58.378,7401.9858 55.904,7401.39452 55.212,7401.22921 L53.702,7405.90467 C51.401,7405.94828 49.316,7406.58316 47.765,7407.59331 C47.354,7407.22312 46.822,7407.01623 46.264,7407.01623 C45.016,7407.01623 44,7408.04665 44,7409.31339 C44,7410.11765 44.414,7410.85497 45.076,7411.26876 C44.473,7414.88134 48.67,7418 53.958,7418 C59.224,7418 63.407,7414.90872 62.849,7411.3144 C63.557,7410.91176 64,7410.1572 64,7409.31339"
+                                  id="reddit-[#143]">
+                            </path>
+                        </g>
+                    </g>
+                </g>
+            </svg>
+        </button>
+        <button id="copy-link"
+                data-url={url}
+                class="flex items-center justify-center no-underline w-18 h-10 mr-3 text-sm bg-white dark:bg-gray-800 border border-black dark:border-gray-700 dark:hover:border-white text-gray-800 dark:text-gray-200 px-2 py-1 [box-shadow:10px_10px_#4F46E5] transition duration-150 ease-in-out active:scale-95 active:bg-indigo-100 dark:active:bg-indigo-900"
+                aria-label="Copiar enlace">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-clipboard"
+                 viewBox="0 0 16 16">
+                <path d="M10 1.5v1a.5.5 0 0 0 .5.5h2A1.5 1.5 0 0 1 14 4v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a1.5 1.5 0 0 1 1.5-1.5h2a.5.5 0 0 0 .5-.5v-1A.5.5 0 0 1 6.5 1h3a.5.5 0 0 1 .5.5zm-1 0h-2v1h2v-1z"/>
+            </svg>
+        </button>
+    </div>
+</div>
+  <script type="module" is:inline>
+      const button = document.getElementById("copy-link");
+      const pageUrl = button?.getAttribute("data-url") || window.location.href;
+      button?.addEventListener("click", () => {
+          navigator.clipboard.writeText(pageUrl).then(
+              () => {
+                  const originalContent = button.innerHTML;
+                  button.innerHTML = "✓";
+                  setTimeout(() => {
+                      button.innerHTML = "Copiado!";
+                      setTimeout(() => {
+                          button.innerHTML = originalContent;
+                      }, 1500);
+                  }, 1000);
+              },
+              (err) => {
+                  console.error("No se pudo copiar el enlace: ", err);
+              }
+          );
+      });
+  </script>
