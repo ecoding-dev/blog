@@ -1,0 +1,56 @@
+---
+// src/pages/@[username].astro
+import authors from '../data/authors.json';
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from "../components/sections/Header.astro";
+import Footer from "../components/sections/Footer.astro";
+import BaseHead from "../components/BaseHead.astro";
+import PostCard from "../components/ui/card/PostCard.astro";
+import BlogPagination from "../components/ui/nav/BlogPagination.astro";
+import {getAuthorById} from "../lib/author";
+
+export async function getStaticPaths() {
+    return authors.map((author) => ({
+        params: { username: author.id },
+    }));
+}
+
+const PAGE_SIZE = 6;
+const { username } = Astro.params;
+const author = authors.find((a) => a.id === username);
+const posts = (await getCollection('blog')).filter(
+    (post) => post.data.author === username
+);
+const totalPages = Math.max(1, Math.ceil(posts.length / PAGE_SIZE));
+const { page } = Astro.params;
+const currentPage = Math.max(1, parseInt(page || '1', 10));
+const start = (currentPage - 1) * PAGE_SIZE;
+const end = start + PAGE_SIZE;
+const pagePosts = posts.slice(start, end);
+const authorName = posts[0]?.data.author || 'Site Author';
+---
+
+<html lang="es" data-theme="dark" class="dark">
+<head>
+    <BaseHead title={`Artículos de ${author?.name}`} description={`Entradas escritas por ${author?.name}`} />
+</head>
+<body>
+<Header />
+<main class="mx-auto max-w-6xl px-4 py-10 space-y-6">
+    <h1 class="text-3xl font-bold">Artículos de {author?.name}</h1>
+    <div class="blog-grid">
+        {pagePosts.map((p) => (
+                <PostCard post={p} />
+        ))}
+    </div>
+    <BlogPagination
+      currentPage={currentPage}
+      totalPages={totalPages}
+      basePath={`/@${username}/page`}
+      firstPagePath={`/@${username}`}
+    />
+</main>
+<Footer />
+</body>
+</html>

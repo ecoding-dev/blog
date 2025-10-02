@@ -3,9 +3,9 @@ export function slugifyTag(input: string): string {
     input
       .trim()
       .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
+      .normalize('NFD') // Normalize accented characters
+      .replace(/\p{Diacritic}/gu, '') // Remove diacritical marks
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/[^a-z0-9-]/g, '') // Remove invalid characters
   );
 }
-
-
