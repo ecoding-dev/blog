@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/sections/Footer.astro';
@@ -9,6 +9,7 @@ import PostMeta from '../components/ui/meta/PostMeta.astro';
 import ShareButtons from '../components/ui/share/ShareButtons.astro';
 import PostNav from '../components/ui/nav/PostNav.astro';
 import { slugifyCategory } from '../data/categories';
+import FallbackImage from '../assets/images/blog-placeholder-1.jpg';
 
 import type { MarkdownHeading } from 'astro';
 import TOC from "../pages/blog/TOC.astro";
@@ -30,6 +31,9 @@ const {
 } = Astro.props as Props;
 
 const author = getAuthorById(Astro.props.author || 'fabrizio');
+const processedHeroImage = heroImage
+  ? await getImage({ src: heroImage, format: 'webp' })
+  : await getImage({ src: FallbackImage, format: 'webp' });
 
 ---
 
@@ -38,7 +42,7 @@ const author = getAuthorById(Astro.props.author || 'fabrizio');
 	<BaseHead
 		title={title}
 		description={description}
-		image={heroImage}
+		image={processedHeroImage.src}
 		section={Astro.props.category}
 		datePublished={pubDate ? new Date(pubDate).toISOString() : undefined}
 		dateModified={updatedDate ? new Date(updatedDate).toISOString() : undefined}
