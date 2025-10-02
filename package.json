@@ -28,6 +28,6 @@
     "tw-animate-css": "^1.3.6"
   },
   "engines": {
-    "node": "22.x"
+    "node": "20.x"
   }
 }
