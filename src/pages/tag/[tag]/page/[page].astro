@@ -8,6 +8,7 @@ import BlogPagination from '../../../../components/ui/nav/BlogPagination.astro';
 
 import { slugifyTag } from '../../../../lib/slug';
 import { getTagMeta } from '../../../../data/tags';
+import BaseBody from "../../../../components/BaseBody.astro";
 
 export async function getStaticPaths() {
   const PAGE_SIZE = 6;
@@ -62,6 +63,7 @@ const description = `Entradas etiquetadas con ${meta.title}`;
   )}
 </head>
 <body>
+<BaseBody/>
 <Header />
 <main class="mx-auto max-w-6xl px-4 py-10 space-y-6">
   <h1 class="text-3xl font-bold">Etiqueta: {meta.title}</h1>

@@ -2,6 +2,7 @@
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/sections/Header.astro';
 import Footer from '../components/sections/Footer.astro';
+import BaseBody from "../components/BaseBody.astro";
 
 const { title = "Mi sitio", description = "" } = Astro.props;
 ---
@@ -12,6 +13,7 @@ const { title = "Mi sitio", description = "" } = Astro.props;
     <BaseHead title={title} description={description} />
 </head>
 <body>
+<BaseBody/>
 <Header />
 <main class="use-utility-layout mx-auto max-w-5xl px-3 py-5 space-y-7">
     <slot /> {/* Aquí se inyecta el contenido de cada página */}

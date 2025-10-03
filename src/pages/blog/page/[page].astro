@@ -6,6 +6,7 @@ import Footer from '../../../components/sections/Footer.astro';
 import BlogHero from '../../../components/sections/BlogHero.astro';
 import BlogAllArticles from '../../../components/sections/BlogAllArticles.astro';
 import BlogPagination from '../../../components/ui/nav/BlogPagination.astro';
+import BaseBody from "../../../components/BaseBody.astro";
 
 export async function getStaticPaths() {
   const PAGE_SIZE = 6;
@@ -36,6 +37,7 @@ const basePath = '/blog/page';
     )}
   </head>
   <body>
+  <BaseBody/>
     <Header />
     <BlogHero title="Blog" subtitle="Ideas prácticas sobre análisis de datos, visualización y cómo sacar más provecho a tus herramientas de analítica." />
     <main class="use-utility-layout mx-auto max-w-5xl px-3 py-5 space-y-7">

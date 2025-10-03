@@ -9,6 +9,7 @@ import BlogPagination from '../../components/ui/nav/BlogPagination.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
 import FeaturedPost from '../../components/ui/card/FeaturedPost.astro';
 import { calculateReadingTimeFromHtml } from '../../lib/reading';
+import BaseBody from "../../components/BaseBody.astro";
 
 const PAGE_SIZE = 6;
 const posts = (await getCollection('blog')).sort((a,b)=>+b.data.pubDate-+a.data.pubDate);
@@ -33,6 +34,7 @@ const basePath = '/blog/page';
     )}
 	</head>
 	<body>
+    <BaseBody/>
         <Header />
         <BlogHero title="Blog" subtitle="Ideas prácticas sobre análisis de datos, visualización y cómo sacar más provecho a tus herramientas de analítica." />
         <main class="use-utility-layout mx-auto max-w-5xl px-3 py-5 space-y-7">

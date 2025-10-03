@@ -15,6 +15,7 @@ import type { MarkdownHeading } from 'astro';
 import TOC from "../pages/blog/TOC.astro";
 import {getAuthorById} from "../lib/author";
 import {slugifyTag} from "../lib/slug";
+import BaseBody from "../components/BaseBody.astro";
 
 type BlogData = CollectionEntry<'blog'>['data'];
 type Props = BlogData & {
@@ -146,6 +147,7 @@ const processedHeroImage = heroImage
 </head>
 
 <body>
+<BaseBody/>
 <Header />
 <div class="container mx-auto px-4 max-w-[1080px]">
 	<div class="relative flex-grow mt-8 sm:mt-12 md:mt-[3.5rem] lg:mt-20 xl:mt-24">

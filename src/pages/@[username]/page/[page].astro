@@ -6,6 +6,7 @@ import Header from '../../../components/sections/Header.astro';
 import Footer from '../../../components/sections/Footer.astro';
 import PostCard from '../../../components/ui/card/PostCard.astro';
 import BlogPagination from '../../../components/ui/nav/BlogPagination.astro';
+import BaseBody from "../../../components/BaseBody.astro";
 
 export async function getStaticPaths() {
   const PAGE_SIZE = 6;
@@ -42,6 +43,7 @@ const pagePosts = posts.slice(start, end);
   <BaseHead title={`Artículos de ${author?.name} - Página ${currentPage}`} description={`Entradas escritas por ${author?.name}`} />
 </head>
 <body>
+<BaseBody/>
   <Header />
   <main class="mx-auto max-w-6xl px-4 py-10 space-y-6">
     <h1 class="text-3xl font-bold">Artículos de {author?.name}</h1>

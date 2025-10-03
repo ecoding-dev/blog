@@ -33,6 +33,7 @@ import { studies } from "../data/studies";
 
 // Content
 import { getCollection } from 'astro:content';
+import BaseBody from "../components/BaseBody.astro";
 const pageTitle = "Demo de Componentes y Secciones";
 const pageDescription = "Demostración de componentes y secciones con tematización clara/oscura.";
 const posts = await getCollection('blog');
@@ -44,6 +45,7 @@ const [firstPost, secondPost, thirdPost] = posts.slice(0, 3);
     <BaseHead title={pageTitle} description={pageDescription} />
   </head>
   <body>
+  <BaseBody/>
     <Header />
     <main class="mx-auto max-w-6xl px-4 py-10 space-y-10">
       <section class="space-y-4">

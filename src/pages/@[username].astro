@@ -9,6 +9,7 @@ import BaseHead from "../components/BaseHead.astro";
 import PostCard from "../components/ui/card/PostCard.astro";
 import BlogPagination from "../components/ui/nav/BlogPagination.astro";
 import {getAuthorById} from "../lib/author";
+import BaseBody from "../components/BaseBody.astro";
 
 export async function getStaticPaths() {
     return authors.map((author) => ({
@@ -36,6 +37,7 @@ const authorName = posts[0]?.data.author || 'Site Author';
     <BaseHead title={`Artículos de ${author?.name}`} description={`Entradas escritas por ${author?.name}`} />
 </head>
 <body>
+<BaseBody/>
 <Header />
 <main class="mx-auto max-w-6xl px-4 py-10 space-y-6">
     <h1 class="text-3xl font-bold">Artículos de {author?.name}</h1>

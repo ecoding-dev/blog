@@ -2,6 +2,7 @@
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/sections/Header.astro';
 import Footer from '../components/sections/Footer.astro';
+import BaseBody from "../components/BaseBody.astro";
 ---
 
 <html lang="es" data-theme="dark" class="dark">
@@ -9,6 +10,7 @@ import Footer from '../components/sections/Footer.astro';
     <BaseHead title="404 – Página no encontrada" description="La página que buscas no existe." />
   </head>
   <body>
+  <BaseBody/>
     <Header />
     <main class="mx-auto max-w-6xl px-4 py-16">
       <section class="card-surface p-8 text-center space-y-4">
