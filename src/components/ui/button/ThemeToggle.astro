@@ -11,35 +11,36 @@
 </button>
 
 <script is:inline>
-  (function () {
-    const storageKey = 'theme';
-    const root = document.documentElement;
+  const storageKey = 'theme';
+  const root = document.documentElement;
+
+  function applyTheme() {
+    const t = localStorage.getItem(storageKey) === 'dark' ? 'dark' : 'light';
+    root.dataset.theme = t;
+    root.classList.toggle('dark', t === 'dark');
+  }
+
+  // 1) Aplica tema antes de pintar la nueva página (evita “flash”)
+  document.addEventListener('astro:after-swap', applyTheme);
+
+  // 2) (Re)conecta el click del botón en cada navegación
+  document.addEventListener('astro:page-load', () => {
     const btn = document.querySelector('[data-theme-toggle]');
+    if (!btn) return;
+    // sincroniza aria-pressed con el estado actual
+    btn.setAttribute('aria-pressed', String(root.classList.contains('dark')));
+    btn.onclick = () => {
+      const next = root.classList.contains('dark') ? 'light' : 'dark';
+      localStorage.setItem(storageKey, next);
+      applyTheme();
+      btn.setAttribute('aria-pressed', String(next === 'dark'));
+    };
+  });
 
-    function applyTheme(theme) {
-      const isDark = theme === 'dark';
-      root.dataset.theme = isDark ? 'dark' : 'light';
-      root.classList.toggle('dark', isDark);
-      if (btn) btn.setAttribute('aria-pressed', String(isDark));
-    }
-
-    function getInitialTheme() {
-      const saved = localStorage.getItem(storageKey);
-      if (saved === 'dark' || saved === 'light') return saved;
-      // Infer from current DOM as fallback
-      return root.classList.contains('dark') || root.dataset.theme === 'dark' ? 'dark' : 'light';
-    }
-
-    let current = getInitialTheme();
-    applyTheme(current);
-
-    btn?.addEventListener('click', () => {
-      current = current === 'dark' ? 'light' : 'dark';
-      localStorage.setItem(storageKey, current);
-      applyTheme(current);
-    });
-  })();
+  // Primera carga
+  applyTheme();
 </script>
+
 
 <style is:inline>
   [data-theme-toggle] .icon-moon { display: none; }
